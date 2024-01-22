@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fullName String?
+  email    String  @unique
+  hash     String
+
+  @@map("users")
+}
+
+model MedicalSupplyGroup {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  isDeleted Boolean @default(false)
+
+  medicalSupplies MedicalSupply[]
+}
+
+model MedicalSupply {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean @default(false)
+
+  name        String
+  brand       String
+  description String?
+
+  medicalSupplyGroup   MedicalSupplyGroup?     @relation(fields: [medicalGroupId], references: [id])
+  medicalGroupId       String
+
+  storages MedicalSupplyStorage[]
+}
+
+model MedicalSupplyStorage {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean @default(false)
+
+  batch        String  @unique
+  quantity     Int     @default(1)
+  informations String?
+
+  medicalSupply MedicalSupply?  @relation(fields: [medicalSupllyId], references: [id])
+  medicalSupllyId String
+}
